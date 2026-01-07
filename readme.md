@@ -1,6 +1,6 @@
 # Hospital Management System
 
-A comprehensive healthcare management platform built with Jakarta EE, demonstrating modern Java web application architecture with multi-database persistence.
+- A comprehensive healthcare management platform built with Jakarta EE, demonstrating modern Java web application architecture with multi-database persistence.
 
 ## Overview
 
