@@ -35,7 +35,7 @@ The application follows a layered architecture pattern:
 
 ## System Architecture
 
-![System Architecture](assets/system_architecture.png)
+![System Architecture](assets/system_architecture_.png)
 
 The application employs a comprehensive three-tier architecture:
 
