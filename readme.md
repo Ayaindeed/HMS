@@ -44,49 +44,36 @@ The application employs a comprehensive three-tier architecture:
 3. **Data Persistence Layer**: Multiple database backends optimized for different use cases
 4. **Configuration Layer**: Centralized management of database connections and framework initialization
 
-## Jakarta EE Annotations
+## Annotations Reference
 
-This project extensively uses Jakarta Persistence (JPA) annotations for declarative data mapping:
+This project extensively uses Jakarta EE annotations for declarative configuration and data mapping:
 
-### Entity Annotations
+### CDI (Contexts and Dependency Injection)
+- `@Inject` - Injects managed bean instance (used in all servlets for service injection)
+- `@ApplicationScoped` - Bean exists for application lifetime, shared across requests (PatientService, MedecinService, RendezVousService, DashboardService, AuditMongoService)
 
-#### @Entity
-- Marks a class as a JPA entity that maps to a database table
-- Applied to: `Patient`, `Medecin`, `RendezVous`, `DossierMedical`, `ServiceHospitalier`
+### Jakarta Servlet Annotations
+- `@WebServlet("/path")` - Maps servlet to URL pattern (PatientServlet, MedecinServlet, RendezVousServlet, DashboardServlet)
 
-#### @Table(name = "table_name")
-- Specifies the database table name for the entity
-- Examples:
-  - `@Table(name = "patients")` for Patient entity
-  - `@Table(name = "medecins")` for Medecin entity
-  - `@Table(name = "rendezvous")` for RendezVous entity
+### JPA/Hibernate Entity Annotations
+- `@Entity` - Marks class as JPA entity (Patient, Medecin, RendezVous, DossierMedical, ServiceHospitalier)
+- `@Table(name="table_name")` - Maps entity to database table
+  - Examples: `@Table(name = "patients")` for Patient entity, `@Table(name = "medecins")` for Medecin entity, `@Table(name = "rendezvous")` for RendezVous entity
+- `@Id` - Marks field as primary key (used in all entity classes for unique identification)
+- `@GeneratedValue(strategy=IDENTITY)` - Auto-increment primary key (uses `GenerationType.IDENTITY` for database sequences)
+- `@Column(name="col_name")` - Maps field to database column
+  - Parameters: `name` (column name), `nullable` (allow NULL), `unique` (unique constraint), `length` (VARCHAR length)
+- `@ManyToOne(fetch=LAZY)` - Many-to-one relationship (RendezVous→Patient, RendezVous→Medecin, Medecin→ServiceHospitalier)
+- `@OneToMany(mappedBy="field")` - One-to-many relationship (Patient→RendezVous, Patient→DossierMedical, ServiceHospitalier→Medecin)
+- `@JoinColumn(name="fk_column")` - Foreign key column specification
+- `@Transient` - Excludes field from persistence
+- `@PrePersist` - Lifecycle callback before entity insert (sets timestamps)
+- `@PreUpdate` - Lifecycle callback before entity update (updates timestamps)
 
-#### @Id
-- Marks a field as the primary key of the entity
-- Used in all entity classes for unique identification
-
-#### @GeneratedValue
-- Specifies how primary keys are generated
-- Strategy: `GenerationType.IDENTITY` for auto-incrementing database sequences
-
-#### @Column
-- Maps a field to a specific database column
-- Parameters include:
-  - `name`: Column name in database
-  - `nullable`: Whether NULL values are allowed
-  - `unique`: Enforces unique constraint
-  - `length`: VARCHAR field length
-
-#### @OneToMany / @ManyToOne
-- Defines relationships between entities
-- Used for managing patient appointments and doctor-patient associations
-
-### Configuration Annotations
-
-#### @Configuration Classes
-- **JpaConfig**: Manages EntityManagerFactory initialization with environment-based PostgreSQL connection
-- **MongoConfig**: Handles MongoDB client creation for audit logging
-- **RedisConfig**: Initializes Jedis connection pools for distributed caching
+### Configuration Classes
+- **JpaConfig**: Manages EntityManagerFactory initialization with environment-based PostgreSQL connection (uses `@Configuration` annotation)
+- **MongoConfig**: Handles MongoDB client creation for audit logging (uses `@Configuration` annotation)
+- **RedisConfig**: Initializes Jedis connection pools for distributed caching (uses `@Configuration` annotation)
 
 ## Technologies
 
@@ -201,28 +188,6 @@ The application exposes REST APIs for all entities:
 
 **Note:** PUT/DELETE requests should use query parameters instead of request body due to Tomcat servlet configuration.
 
-
-## Annotations Reference
-
-### CDI (Contexts and Dependency Injection)
-- `@Inject` - Injects managed bean instance (used in all servlets for service injection)
-- `@ApplicationScoped` - Bean exists for application lifetime, shared across requests (PatientService, MedecinService, RendezVousService, DashboardService, AuditMongoService)
-
-### Jakarta Servlet Annotations
-- `@WebServlet("/path")` - Maps servlet to URL pattern (PatientServlet, MedecinServlet, RendezVousServlet, DashboardServlet)
-
-### JPA/Hibernate Entity Annotations
-- `@Entity` - Marks class as JPA entity (Patient, Medecin, RendezVous, DossierMedical, ServiceHospitalier)
-- `@Table(name="table_name")` - Maps entity to database table
-- `@Id` - Marks field as primary key
-- `@GeneratedValue(strategy=IDENTITY)` - Auto-increment primary key
-- `@Column(name="col_name")` - Maps field to database column
-- `@ManyToOne(fetch=LAZY)` - Many-to-one relationship (RendezVous→Patient, RendezVous→Medecin, Medecin→ServiceHospitalier)
-- `@OneToMany(mappedBy="field")` - One-to-many relationship (Patient→RendezVous, Patient→DossierMedical, ServiceHospitalier→Medecin)
-- `@JoinColumn(name="fk_column")` - Foreign key column specification
-- `@Transient` - Excludes field from persistence
-- `@PrePersist` - Lifecycle callback before entity insert (sets timestamps)
-- `@PreUpdate` - Lifecycle callback before entity update (updates timestamps)
 
 ## Troubleshooting
 
